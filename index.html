@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلسلة أنت والرياضيات | بوابة تسجيل الدخول</title>
+    <!-- اللوجو في علامة التبويب فوق -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co/pvxkcrPf/logo.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Traditional Arabic", "Simplified Arabic", "Times New Roman", Arial, Tahoma, sans-serif;
+        }
+        body {
+            background-color: #000000;
+            color: #d1bfa9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: 'f(x) = ∫ e^x dx   ∑ (n=1 to ∞)   π ≈ 3.14159   Δ = b² - 4ac   sin²θ + cos²θ = 1   √x   dy/dx';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 16px;
+            color: rgba(212, 175, 55, 0.015);
+            word-spacing: 30px;
+            line-height: 60px;
+            z-index: -2;
+            user-select: none;
+            overflow: hidden;
+            padding: 15px;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.97) 0%, rgba(0, 0, 0, 0.99) 100%);
+            z-index: -1;
+        }
+        header {
+            background-color: #0a0a0a;
+            color: #f3e9dc;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #261c14;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .site-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #d4af37;
+            background-color: #000000;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        .site-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-area h1 {
+            font-size: 19px;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+        .logo-area h1 .math-text {
+            color: #d4af37;
+        }
+        .logo-area h1 .author-sub {
+            display: block;
+            font-size: 12px;
+            color: #a38f78;
+            font-weight: normal;
+        }
+        .portal-badge {
+            font-size: 13px;
+            background: #14100c;
+            color: #d4af37;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid #261c14;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: #0d0d0d;
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #261c14;
+            text-align: right;
+        }
+        .login-card h2 {
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: bold;
+        }
+        .login-card p {
+            margin-bottom: 18px;
+            color: #a38f78;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 11px;
+            font-size: 19px;
+            text-align: center;
+            background-color: #050505;
+            border: 1px solid #261c14;
+            color: #ffd166;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        .login-card input:focus {
+            border-color: #d4af37;
+        }
+        .login-card button {
+            width: 100%;
+            background-color: #d4af37;
+            color: #000000;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .login-card button:hover {
+            background-color: #c29d2e;
+        }
+        .error-msg {
+            color: #e06d6d;
+            margin-top: 12px;
+            font-size: 13px;
+            display: none;
+            background: rgba(224, 109, 109, 0.08);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(224, 109, 109, 0.2);
+            text-align: center;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #0a0a0a;
+            color: #8c7862;
+            font-size: 12px;
+            border-top: 1px solid #261c14;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid #d4af37;
+            background-color: #000;
+        }
+        .footer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* تعديلات شاشات الكمبيوتر */
+        @media (min-width: 769px) {
+            header {
+                padding: 20px 40px;
+            }
+            .site-logo {
+                width: 65px;
+                height: 65px;
+            }
+            .logo-area {
+                gap: 20px;
+            }
+            .logo-area h1 {
+                font-size: 26px;
+            }
+            .logo-area h1 .author-sub {
+                font-size: 16px;
+            }
+            .portal-badge {
+                font-size: 16px;
+                padding: 8px 18px;
+            }
+            .login-card {
+                max-width: 480px;
+                padding: 40px 35px;
+            }
+            .login-card h2 {
+                font-size: 28px;
+                margin-bottom: 12px;
+            }
+            .login-card p {
+                font-size: 17px;
+                margin-bottom: 25px;
+            }
+            .form-group label {
+                font-size: 17px;
+                margin-bottom: 8px;
+            }
+            .login-card input {
+                padding: 15px;
+                font-size: 24px;
+                letter-spacing: 3px;
+            }
+            .login-card button {
+                padding: 15px;
+                font-size: 19px;
+            }
+            .error-msg {
+                font-size: 15px;
+                padding: 10px;
+            }
+            .footer-logo {
+                width: 50px;
+                height: 50px;
+            }
+            footer {
+                font-size: 15px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="site-logo">
+                <img src="https://i.ibb.co/pvxkcrPf/logo.png" alt="شعار أنت والرياضيات">
+            </div>
+            <h1>
+                أنت <span class="math-text">والرياضيات</span>
+                <span class="author-sub">الاستاذ / السيد التابعى</span>
+            </h1>
+        </div>
+        <div class="portal-badge">بوابة الطلاب</div>
+    </header>
+
+    <div class="container">
+        <div class="login-card">
+            <h2>تسجيل الدخول</h2>
+            <p>أدخل الكود التعريفي الخاص بك للانضمام إلى حصص ودروس الرياضيات للمرحلة الإعدادية والثانوية.</p>
+            
+            <div class="form-group">
+                <label for="studentCode">كود الطالب</label>
+                <input type="text" id="studentCode" placeholder="أدخل الكود هنا" autocomplete="off">
+            </div>
+
+            <button onclick="handleLogin()">دخول المنصة</button>
+            <div id="errorMsg" class="error-msg">حدث خطأ ما.</div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-logo">
+            <img src="https://i.ibb.co/pvxkcrPf/logo.png" alt="شعار سفلي">
+        </div>
+        <div>جميع الحقوق محفوظة © سلسلة أنت والرياضيات 2026</div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://math-9b8ab-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const gradeFiles = {
+            "prep_1": "first-prep.html",
+            "prep_2": "second-prep.html",
+            "prep_3": "third-prep.html",
+            "sec_1": "first-secondary.html",
+            "sec_2": "second-secondary.html",
+            "sec_3": "third-secondary.html"
+        };
+
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('math_device_id');
+            if (!deviceId) {
+                deviceId = 'dev_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('math_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        window.onload = async function() {
+            const savedCode = localStorage.getItem('activeStudentCode');
+            const savedGrade = localStorage.getItem('activeStudentGrade');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (savedCode && savedGrade && gradeFiles[savedGrade]) {
+                const currentDevice = getDeviceId();
+                try {
+                    const snapshot = await db.ref(`grades/${savedGrade}/codes/${savedCode}`).once('value');
+                    const codeData = snapshot.val();
+
+                    if (!codeData) {
+                        localStorage.removeItem('activeStudentCode');
+                        localStorage.removeItem('activeStudentGrade');
+                        return;
+                    }
+
+                    if (codeData.active === false) {
+                        errorMsg.innerText = "عذراً، هذا الكود موقوف مؤقتاً من قبل الإدارة.";
+                        errorMsg.style.display = 'block';
+                        return;
+                    }
+
+                    if (codeData.active === true) {
+                        if (!codeData.deviceId) {
+                            await db.ref(`grades/${savedGrade}/codes/${savedCode}`).update({ deviceId: currentDevice });
+                        }
+                        window.location.href = gradeFiles[savedGrade];
+                        return;
+                    }
+                } catch (e) {
+                    console.log("خطأ في الاتصال بالسيرفر");
+                }
+            }
+        };
+
+        async function handleLogin() {
+            const inputCode = document.getElementById('studentCode').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!inputCode) {
+                errorMsg.innerText = "يرجى إدخال الكود أولاً.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            errorMsg.style.display = 'none';
+
+            // 1. التحقق أولاً هل الكود المدخل هو كود الكنترول الإداري المخزن في قاعدة البيانات
+            try {
+                const adminSnap = await db.ref('adminConfig/adminSecretCode').once('value');
+                const correctAdminCode = adminSnap.val();
+
+                if (correctAdminCode && inputCode === correctAdminCode) {
+                    localStorage.setItem('adminSession', 'active');
+                    window.location.href = "control.html"; // اسم صفحة الكنترول الخاصة بك
+                    return;
+                }
+            } catch (err) {
+                console.log("خطأ في التحقق من كود الإدارة");
+            }
+
+            // 2. إذا لم يكن كود كنترول، يتم البحث في أكواد الطلاب عبر الصفوف الدراسية كالمعتاد
+            const currentDevice = getDeviceId();
+            const gradesKeys = ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"];
+            
+            let foundGrade = null;
+            let foundData = null;
+
+            try {
+                for (let gradeKey of gradesKeys) {
+                    const snapshot = await db.ref(`grades/${gradeKey}/codes/${inputCode}`).once('value');
+                    if (snapshot.exists()) {
+                        foundGrade = gradeKey;
+                        foundData = snapshot.val();
+                        break;
+                    }
+                }
+
+                if (!foundGrade || !foundData) {
+                    errorMsg.innerText = "هذا الكود غير مسجل في النظام.";
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                if (foundData.active === false) {
+                    errorMsg.innerText = "عذراً، هذا الكود موقوف حالياً من الإدارة ولا يمكن استخدامه.";
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                if (foundData.deviceId && foundData.deviceId !== currentDevice) {
+                    errorMsg.innerText = "عذراً، هذا الكود مرتبط بجهاز آخر بالفعل.";
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                if (!foundData.deviceId) {
+                    await db.ref(`grades/${foundGrade}/codes/${inputCode}`).update({
+                        deviceId: currentDevice
+                    });
+                }
+
+                localStorage.setItem('activeStudentCode', inputCode);
+                localStorage.setItem('activeStudentGrade', foundGrade);
+                window.location.href = gradeFiles[foundGrade];
+
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = "حدث خطأ في الاتصال بالخادم، حاول مرة أخرى.";
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        document.getElementById('studentCode').addEventListener('keypress', function (e) {
+            (e.key === 'Enter') && handleLogin();
+        });
+    </script>
+</body>
+</html>
