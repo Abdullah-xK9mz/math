@@ -116,7 +116,6 @@
         }
         button:hover { background-color: #c29d2e; }
         
-        /* قائمة الأسماء عند البحث */
         .name-list {
             background: #0d0d0d;
             border: 1px solid #261c14;
@@ -154,14 +153,12 @@
 <div class="container">
     <h2>لوحة إدارة الأكواد والطلاب</h2>
 
-    <!-- 1. البحث السريع في الأعلى -->
     <div class="search-section" id="searchSectionBox">
         <label>🔍 بحث سريع (ابحث باسم الطالب أو بالكود):</label>
         <input type="text" id="searchInput" placeholder="اكتب للبحث الفوري..." autocomplete="off" oninput="filterData()">
         <div id="nameListContainer" class="name-list" style="display: none;"></div>
     </div>
 
-    <!-- 2. خانات البيانات -->
     <div class="form-section">
         <input type="hidden" id="originalCode" value="">
         
@@ -196,12 +193,10 @@
             </select>
         </div>
 
-        <!-- الأزرار الافتراضية (وضع الإضافة) -->
         <div id="defaultAddBtnContainer">
             <button onclick="saveNewStudent()">إضافة طالب جديد</button>
         </div>
 
-        <!-- الأزرار التي تظهر بعد اختيار طالب من البحث -->
         <div id="selectedStudentActions" class="action-buttons" style="display: none;">
             <button class="edit-mode-btn" onclick="enableEditing()">تعديل</button>
             <button class="delete-mode-btn" onclick="deleteSelectedStudent()">حذف</button>
@@ -231,7 +226,6 @@
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 for (let gradeKey in data) {
-                    // استثناء صف الكنترول من قائمة بحث الطلاب العادية لكي لا يظهر كطالب
                     if (gradeKey === "control_grade") continue;
 
                     if (data[gradeKey] && data[gradeKey].codes) {
@@ -253,7 +247,6 @@
         }
     };
 
-    // التحكم في ظهور العناصر عند اختيار "كنترول" من القائمة
     window.handleGradeChange = async function() {
         const gradeVal = document.getElementById("gradeSelect").value;
         const nameGroup = document.getElementById("studentNameGroup");
@@ -266,15 +259,13 @@
         actionsDiv.style.display = "none";
 
         if (gradeVal === "control_grade") {
-            // تخصيص واجهة الكنترول (إخفاء حقل اسم الطالب وحقول البحث لأن كود الكنترول يتم حفظه مباشرة ككود تفعيل)
             nameGroup.style.display = "none";
-            statusGroup.style.display = "block"; // يمكن تفعيل أو تعطيل كود الكنترول أيضاً
+            statusGroup.style.display = "block";
             searchSection.style.display = "none";
             codeLabel.innerText = "كود الإدارة السري:";
             btnContainer.style.display = "block";
             btnContainer.innerHTML = `<button onclick="saveAdminSecret()" class="new-mode-btn">حفظ كود الكنترول</button>`;
             
-            // جلب الكود الحالي المحفوظ في قاعدة البيانات لعرضه
             try {
                 const snapshot = await get(ref(db, 'grades/control_grade/codes'));
                 if (snapshot.exists()) {
@@ -294,7 +285,6 @@
                 document.getElementById("codeInput").value = "";
             }
         } else {
-            // إعادة إظهار الحقول المعتادة للطلاب
             nameGroup.style.display = "block";
             statusGroup.style.display = "block";
             searchSection.style.display = "block";
@@ -306,7 +296,6 @@
         }
     };
 
-    // حفظ كود الكنترول السري بالطريقة القياسية داخل grades/control_grade/codes
     window.saveAdminSecret = async function() {
         const secretCode = document.getElementById("codeInput").value.trim();
         const active = document.getElementById("statusSelect").value === "true";
@@ -318,12 +307,10 @@
         }
 
         try {
-            // لو تم تغيير الكود القديم، نحذف القديم أولاً
             if (oldCode && oldCode !== secretCode) {
                 await remove(ref(db, `grades/control_grade/codes/${oldCode}`));
             }
 
-            // حفظ الكود الجديد بالهيكل المعتاد
             await set(ref(db, `grades/control_grade/codes/${secretCode}`), {
                 studentName: "Admin Control",
                 active: active
@@ -336,7 +323,6 @@
         }
     };
 
-    // دالة البحث
     window.filterData = function() {
         let query = document.getElementById("searchInput").value.toLowerCase().trim();
         let listContainer = document.getElementById("nameListContainer");
@@ -371,7 +357,6 @@
         });
     };
 
-    // عند اختيار طالب من نتائج البحث
     window.selectStudent = function(item) {
         document.getElementById("gradeSelect").value = item.gradeKey;
         handleGradeChange();
@@ -391,7 +376,6 @@
         document.getElementById("searchInput").value = "";
     };
 
-    // قفل أو فتح الحقول
     function setFieldsLock(isLocked) {
         document.getElementById("studentNameInput").disabled = isLocked;
         document.getElementById("codeInput").disabled = isLocked;
@@ -399,7 +383,6 @@
         document.getElementById("statusSelect").disabled = isLocked;
     }
 
-    // زر التعديل
     window.enableEditing = function() {
         setFieldsLock(false);
         let actionsDiv = document.getElementById("selectedStudentActions");
@@ -409,7 +392,6 @@
         `;
     };
 
-    // العودة لوضع الإضافة الجديد
     window.resetToAddNew = function() {
         document.getElementById("gradeSelect").value = "prep_1";
         handleGradeChange();
@@ -430,7 +412,6 @@
         `;
     };
 
-    // حفظ طالب جديد
     window.saveNewStudent = async function() {
         const grade = document.getElementById("gradeSelect").value;
 
@@ -461,7 +442,6 @@
         }
     };
 
-    // حفظ التعديلات بعد الضغط على تعديل
     window.saveEditedStudent = async function() {
         const grade = document.getElementById("gradeSelect").value;
         
@@ -502,7 +482,6 @@
         }
     };
 
-    // حذف الطالب المحدد
     window.deleteSelectedStudent = async function() {
         const grade = document.getElementById("gradeSelect").value;
         const code = document.getElementById("codeInput").value.trim();
