@@ -174,7 +174,7 @@
                 <option value="sec_1">الأول الثانوي</option>
                 <option value="sec_2">الثاني الثانوي</option>
                 <option value="sec_3">الثالث الثانوي</option>
-                <option value="control">كنترول (لوحة التحكم)</option>
+                <option value="control_grade">كنترول (لوحة التحكم)</option>
             </select>
         </div>
 
@@ -231,6 +231,9 @@
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 for (let gradeKey in data) {
+                    // استثناء صف الكنترول من قائمة بحث الطلاب العادية لكي لا يظهر كطالب
+                    if (gradeKey === "control_grade") continue;
+
                     if (data[gradeKey] && data[gradeKey].codes) {
                         let codesObj = data[gradeKey].codes;
                         for (let codeKey in codesObj) {
@@ -244,12 +247,6 @@
                         }
                     }
                 }
-            }
-
-            // تحميل كود الكنترول الحالي في حال تم اختياره مسبقاً
-            const adminSnap = await get(ref(db, 'adminConfig/adminSecretCode'));
-            if (adminSnap.exists() && document.getElementById("gradeSelect").value === "control") {
-                document.getElementById("codeInput").value = adminSnap.val();
             }
         } catch (error) {
             console.error("خطأ في التحميل");
@@ -268,20 +265,28 @@
 
         actionsDiv.style.display = "none";
 
-        if (gradeVal === "control") {
-            // إخفاء بحث الطلاب وحقول الاسم والحالة لأن الكنترول كود إداري بحت
+        if (gradeVal === "control_grade") {
+            // تخصيص واجهة الكنترول (إخفاء حقل اسم الطالب وحقول البحث لأن كود الكنترول يتم حفظه مباشرة ككود تفعيل)
             nameGroup.style.display = "none";
-            statusGroup.style.display = "none";
+            statusGroup.style.display = "block"; // يمكن تفعيل أو تعطيل كود الكنترول أيضاً
             searchSection.style.display = "none";
-            codeLabel.innerText = "كود الإدارة السري الطويل:";
+            codeLabel.innerText = "كود الإدارة السري:";
             btnContainer.style.display = "block";
             btnContainer.innerHTML = `<button onclick="saveAdminSecret()" class="new-mode-btn">حفظ كود الكنترول</button>`;
             
-            // جلب الكود الحالي المحفوظ في الفايربيس وعرضه
+            // جلب الكود الحالي المحفوظ في قاعدة البيانات لعرضه
             try {
-                const adminSnap = await get(ref(db, 'adminConfig/adminSecretCode'));
-                if (adminSnap.exists()) {
-                    document.getElementById("codeInput").value = adminSnap.val();
+                const snapshot = await get(ref(db, 'grades/control_grade/codes'));
+                if (snapshot.exists()) {
+                    const codesObj = snapshot.val();
+                    const firstCode = Object.keys(codesObj)[0];
+                    if (firstCode) {
+                        document.getElementById("codeInput").value = firstCode;
+                        document.getElementById("statusSelect").value = codesObj[firstCode].active !== false ? "true" : "false";
+                        document.getElementById("originalCode").value = firstCode;
+                    } else {
+                        document.getElementById("codeInput").value = "";
+                    }
                 } else {
                     document.getElementById("codeInput").value = "";
                 }
@@ -297,19 +302,35 @@
             btnContainer.style.display = "block";
             btnContainer.innerHTML = `<button onclick="saveNewStudent()">إضافة طالب جديد</button>`;
             document.getElementById("codeInput").value = "";
+            document.getElementById("studentNameInput").value = "";
         }
     };
 
-    // حفظ كود الكنترول الإداري في فايربيس
+    // حفظ كود الكنترول السري بالطريقة القياسية داخل grades/control_grade/codes
     window.saveAdminSecret = async function() {
         const secretCode = document.getElementById("codeInput").value.trim();
+        const active = document.getElementById("statusSelect").value === "true";
+        const oldCode = document.getElementById("originalCode").value;
+
         if (!secretCode) {
             alert("يرجى إدخال كود الكنترول أولاً!");
             return;
         }
+
         try {
-            await set(ref(db, 'adminConfig/adminSecretCode'), secretCode);
-            alert("تم حفظ كود الكنترول السري بنجاح! يمكنك الآن استخدامه في صفحة الدخول (index.html).");
+            // لو تم تغيير الكود القديم، نحذف القديم أولاً
+            if (oldCode && oldCode !== secretCode) {
+                await remove(ref(db, `grades/control_grade/codes/${oldCode}`));
+            }
+
+            // حفظ الكود الجديد بالهيكل المعتاد
+            await set(ref(db, `grades/control_grade/codes/${secretCode}`), {
+                studentName: "Admin Control",
+                active: active
+            });
+
+            document.getElementById("originalCode").value = secretCode;
+            alert("تم حفظ كود الكنترول السري بنجاح وتوافقه مع نظام الدخول!");
         } catch (e) {
             alert("حدث خطأ أثناء حفظ كود الكنترول.");
         }
@@ -353,7 +374,7 @@
     // عند اختيار طالب من نتائج البحث
     window.selectStudent = function(item) {
         document.getElementById("gradeSelect").value = item.gradeKey;
-        handleGradeChange(); // لضمان ظهور حقول الطالب لو كان الـ select على الكنترول
+        handleGradeChange();
         
         document.getElementById("studentNameInput").value = item.studentName;
         document.getElementById("codeInput").value = item.codeKey;
@@ -411,15 +432,16 @@
 
     // حفظ طالب جديد
     window.saveNewStudent = async function() {
-        const name = document.getElementById("studentNameInput").value.trim();
-        const code = document.getElementById("codeInput").value.trim();
         const grade = document.getElementById("gradeSelect").value;
-        const active = document.getElementById("statusSelect").value === "true";
 
-        if (grade === "control") {
+        if (grade === "control_grade") {
             saveAdminSecret();
             return;
         }
+
+        const name = document.getElementById("studentNameInput").value.trim();
+        const code = document.getElementById("codeInput").value.trim();
+        const active = document.getElementById("statusSelect").value === "true";
 
         if (!name || !code) {
             alert("الرجاء إدخال اسم الطالب وكود التفعيل!");
@@ -441,10 +463,18 @@
 
     // حفظ التعديلات بعد الضغط على تعديل
     window.saveEditedStudent = async function() {
+        const grade = document.getElementById("gradeSelect").value;
+        
+        if (grade === "control_grade") {
+            saveAdminSecret();
+            setFieldsLock(true);
+            resetToAddNew();
+            return;
+        }
+
         const oldCode = document.getElementById("originalCode").value;
         const name = document.getElementById("studentNameInput").value.trim();
         const newCode = document.getElementById("codeInput").value.trim();
-        const grade = document.getElementById("gradeSelect").value;
         const active = document.getElementById("statusSelect").value === "true";
 
         if (!name || !newCode) {
@@ -474,13 +504,19 @@
 
     // حذف الطالب المحدد
     window.deleteSelectedStudent = async function() {
+        const grade = document.getElementById("gradeSelect").value;
         const code = document.getElementById("codeInput").value.trim();
-        if (confirm("هل أنت متأكد من حذف هذا الطالب نهائياً؟")) {
+
+        if (confirm("هل أنت متأكد من حذف هذا العنصر نهائياً؟")) {
             try {
-                for (let gKey of ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"]) {
-                    await remove(ref(db, `grades/${gKey}/codes/${code}`));
+                if (grade === "control_grade") {
+                    await remove(ref(db, `grades/control_grade/codes/${code}`));
+                } else {
+                    for (let gKey of ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"]) {
+                        await remove(ref(db, `grades/${gKey}/codes/${code}`));
+                    }
                 }
-                alert("تم حذف الطالب بنجاح.");
+                alert("تم الحذف بنجاح.");
                 resetToAddNew();
                 loadData();
             } catch (e) {
