@@ -155,10 +155,6 @@
                 أنت <span class="math-text">والرياضيات</span>
                 <span class="author-sub">الاستاذ / السيد التابعى</span>
             </h1>
-        </div>
-        <div class="header-actions">
-            <button class="logout-btn" onclick="logout()">خروج</button>
-        </div>
     </header>
 
     
@@ -520,14 +516,7 @@
         }
     };
 
-    loadData();
-
-     function logout() {
-            localStorage.removeItem('activeStudentCode');
-            localStorage.removeItem('activeStudentGrade');
-            window.location.href = "index.html";
-        }
-    
+    loadData();  }
 </script>
 
 </body>
