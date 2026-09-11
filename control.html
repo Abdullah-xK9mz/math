@@ -261,7 +261,7 @@
 
         if (gradeVal === "control_grade") {
             nameGroup.style.display = "none";
-            statusGroup.style.display = "block";
+            statusGroup.style.display = "none";
             searchSection.style.display = "none";
             codeLabel.innerText = "كود الإدارة السري:";
             btnContainer.style.display = "block";
@@ -274,7 +274,6 @@
                     const firstCode = Object.keys(codesObj)[0];
                     if (firstCode) {
                         document.getElementById("codeInput").value = firstCode;
-                        document.getElementById("statusSelect").value = codesObj[firstCode].active !== false ? "true" : "false";
                         document.getElementById("originalCode").value = firstCode;
                     } else {
                         document.getElementById("codeInput").value = "";
@@ -302,7 +301,6 @@
 
     window.saveAdminSecret = async function() {
         const secretCode = document.getElementById("codeInput").value.trim();
-        const active = document.getElementById("statusSelect").value === "true";
         const oldCode = document.getElementById("originalCode").value;
 
         if (!secretCode) {
@@ -317,7 +315,7 @@
 
             await set(ref(db, `grades/control_grade/codes/${secretCode}`), {
                 studentName: "Admin Control",
-                active: active
+                active: true
             });
 
             document.getElementById("originalCode").value = secretCode;
@@ -508,7 +506,7 @@
         }
     };
 
-    loadData();  }
+    loadData();
 </script>
 
 </body>
