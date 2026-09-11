@@ -210,7 +210,7 @@
     import { getDatabase, ref, set, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
-        databaseURL: "https://math-9cde7-default-rtdb.firebaseio.com/"  /* ضع رابط قاعدة البيانات هنا */
+        databaseURL: "https://math-9cde7-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -257,6 +257,7 @@
         const actionsDiv = document.getElementById("selectedStudentActions");
 
         actionsDiv.style.display = "none";
+        setFieldsLock(false);
 
         if (gradeVal === "control_grade") {
             nameGroup.style.display = "none";
@@ -277,9 +278,11 @@
                         document.getElementById("originalCode").value = firstCode;
                     } else {
                         document.getElementById("codeInput").value = "";
+                        document.getElementById("originalCode").value = "";
                     }
                 } else {
                     document.getElementById("codeInput").value = "";
+                    document.getElementById("originalCode").value = "";
                 }
             } catch (e) {
                 document.getElementById("codeInput").value = "";
@@ -293,6 +296,7 @@
             btnContainer.innerHTML = `<button onclick="saveNewStudent()">إضافة طالب جديد</button>`;
             document.getElementById("codeInput").value = "";
             document.getElementById("studentNameInput").value = "";
+            document.getElementById("originalCode").value = "";
         }
     };
 
@@ -317,7 +321,7 @@
             });
 
             document.getElementById("originalCode").value = secretCode;
-            alert("تم حفظ كود الكنترول السري بنجاح وتوافقه مع نظام الدخول!");
+            alert("تم حفظ كود الكنترول السري بنجاح!");
         } catch (e) {
             alert("حدث خطأ أثناء حفظ كود الكنترول.");
         }
@@ -416,7 +420,7 @@
         const grade = document.getElementById("gradeSelect").value;
 
         if (grade === "control_grade") {
-            saveAdminSecret();
+            await saveAdminSecret();
             return;
         }
 
@@ -446,7 +450,7 @@
         const grade = document.getElementById("gradeSelect").value;
         
         if (grade === "control_grade") {
-            saveAdminSecret();
+            await saveAdminSecret();
             setFieldsLock(true);
             resetToAddNew();
             return;
@@ -463,7 +467,7 @@
         }
 
         try {
-            if (oldCode !== newCode) {
+            if (oldCode && oldCode !== newCode) {
                 for (let gKey of ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"]) {
                     await remove(ref(db, `grades/${gKey}/codes/${oldCode}`));
                 }
