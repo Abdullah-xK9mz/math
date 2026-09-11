@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سلسلة أنت والرياضيات | بوابة تسجيل الدخول</title>
-    <!-- اللوجو في علامة التبويب فوق -->
     <link rel="icon" type="image/png" href="https://i.ibb.co/pvxkcrPf/logo.png">
     <style>
         * {
@@ -210,66 +209,6 @@
             height: 100%;
             object-fit: cover;
         }
-
-        @media (min-width: 769px) {
-            header {
-                padding: 20px 40px;
-            }
-            .site-logo {
-                width: 65px;
-                height: 65px;
-            }
-            .logo-area {
-                gap: 20px;
-            }
-            .logo-area h1 {
-                font-size: 26px;
-            }
-            .logo-area h1 .author-sub {
-                font-size: 16px;
-            }
-            .portal-badge {
-                font-size: 16px;
-                padding: 8px 18px;
-            }
-            .login-card {
-                max-width: 480px;
-                padding: 40px 35px;
-            }
-            .login-card h2 {
-                font-size: 28px;
-                margin-bottom: 12px;
-            }
-            .login-card p {
-                font-size: 17px;
-                margin-bottom: 25px;
-            }
-            .form-group label {
-                font-size: 17px;
-                margin-bottom: 8px;
-            }
-            .login-card input {
-                padding: 15px;
-                font-size: 24px;
-                letter-spacing: 3px;
-            }
-            .login-card button {
-                padding: 15px;
-                font-size: 19px;
-            }
-            .error-msg {
-                font-size: 15px;
-                padding: 10px;
-            }
-            .footer-logo {
-                width: 50px;
-                height: 50px;
-            }
-            footer {
-                font-size: 15px;
-                padding: 20px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -290,7 +229,7 @@
     <div class="container">
         <div class="login-card">
             <h2>تسجيل الدخول</h2>
-            <p>أدخل الكود التعريفي الخاص بك للانضمام إلى حصص ودروس الرياضيات للمرحلة الإعدادية والثانوية.</p>
+            <p>أدخل الكود التعريفي الخاص بك للانضمام إلى الحصص والدروس.</p>
             
             <div class="form-group">
                 <label for="studentCode">كود الطالب</label>
@@ -313,7 +252,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
         const firebaseConfig = {
-            databaseURL: "https://math-9b8ab-default-rtdb.firebaseio.com/"
+            databaseURL: "https://math-9cde7-default-rtdb.firebaseio.com/"  /* ضع رابط قاعدة البيانات هنا */
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -348,27 +287,16 @@
                     const snapshot = await db.ref(`grades/${savedGrade}/codes/${savedCode}`).once('value');
                     const codeData = snapshot.val();
 
-                    if (!codeData) {
+                    if (!codeData || codeData.active === false) {
                         localStorage.removeItem('activeStudentCode');
                         localStorage.removeItem('activeStudentGrade');
                         return;
                     }
 
-                    if (codeData.active === false) {
-                        errorMsg.innerText = "عذراً، هذا الكود موقوف مؤقتاً من قبل الإدارة.";
-                        errorMsg.style.display = 'block';
-                        return;
-                    }
-
-                    if (codeData.active !== false) {
-                        if (!codeData.deviceId && savedGrade !== "control_grade") {
-                            await db.ref(`grades/${savedGrade}/codes/${savedCode}`).update({ deviceId: currentDevice });
-                        }
-                        window.location.href = gradeFiles[savedGrade];
-                        return;
-                    }
+                    window.location.href = gradeFiles[savedGrade];
+                    return;
                 } catch (e) {
-                    console.log("خطأ في الاتصال بالسيرفر");
+                    console.log("خطأ في الاتصال");
                 }
             }
         };
@@ -408,7 +336,7 @@
                 }
 
                 if (foundData.active === false) {
-                    errorMsg.innerText = "عذراً، هذا الكود موقوف حالياً من الإدارة ولا يمكن استخدامه.";
+                    errorMsg.innerText = "عذراً، هذا الكود موقوف حالياً من الإدارة.";
                     errorMsg.style.display = 'block';
                     return;
                 }
@@ -432,7 +360,6 @@
                 window.location.href = gradeFiles[foundGrade];
 
             } catch (error) {
-                console.error(error);
                 errorMsg.innerText = "حدث خطأ في الاتصال بالخادم، حاول مرة أخرى.";
                 errorMsg.style.display = 'block';
             }
