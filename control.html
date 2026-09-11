@@ -520,13 +520,14 @@
         }
     };
 
-        function logout() {
+    loadData();
+
+     function logout() {
             localStorage.removeItem('activeStudentCode');
             localStorage.removeItem('activeStudentGrade');
             window.location.href = "index.html";
         }
-
-    loadData();
+    
 </script>
 
 </body>
