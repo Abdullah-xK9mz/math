@@ -319,13 +319,15 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // إضافة صف الكنترول مع الصفوف الدراسية وملف الـ control.html
         const gradeFiles = {
             "prep_1": "first-prep.html",
             "prep_2": "second-prep.html",
             "prep_3": "third-prep.html",
             "sec_1": "first-secondary.html",
             "sec_2": "second-secondary.html",
-            "sec_3": "third-secondary.html"
+            "sec_3": "third-secondary.html",
+            "control_grade": "control.html"
         };
 
         function getDeviceId() {
@@ -384,24 +386,10 @@
             }
 
             errorMsg.style.display = 'none';
-
-            // 1. التحقق أولاً هل الكود المدخل هو كود الكنترول الإداري المخزن في قاعدة البيانات
-            try {
-                const adminSnap = await db.ref('adminConfig/adminSecretCode').once('value');
-                const correctAdminCode = adminSnap.val();
-
-                if (correctAdminCode && inputCode === correctAdminCode) {
-                    localStorage.setItem('adminSession', 'active');
-                    window.location.href = "control.html"; // اسم صفحة الكنترول الخاصة بك
-                    return;
-                }
-            } catch (err) {
-                console.log("خطأ في التحقق من كود الإدارة");
-            }
-
-            // 2. إذا لم يكن كود كنترول، يتم البحث في أكواد الطلاب عبر الصفوف الدراسية كالمعتاد
             const currentDevice = getDeviceId();
-            const gradesKeys = ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"];
+            
+            // إضافة control_grade لمصفوفة البحث ليتعامل مع الكود كباقي الصفوف تماماً
+            const gradesKeys = ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3", "control_grade"];
             
             let foundGrade = null;
             let foundData = null;
