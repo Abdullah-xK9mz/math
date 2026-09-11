@@ -295,7 +295,12 @@
     };
 
     window.logoutSystem = function() {
-        if (confirm("هل تريد الخروج والانتقال للصفحة الرئيسية؟")) {
+        if (confirm("هل تريد الخروج وتسجيل الدخول من جديد؟")) {
+            // مسح أي بيانات دخول تلقائي أو بصمة جهاز مخزنة محلياً لتجبر النظام على طلب الكود
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // الانتقال لصفحة تسجيل الدخول
             window.location.href = "index.html";
         }
     };
