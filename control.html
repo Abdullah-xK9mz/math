@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة إدارة الأكواد والطلاب</title>
+    <title>لوحة التحكم الشاملة</title>
     <link rel="icon" type="image/png" href="https://i.ibb.co/pvxkcrPf/logo.png">
     <style>
         * {
@@ -105,6 +105,32 @@
             flex-grow: 1;
             margin: 0 10px;
         }
+
+        /* أزرار التنقل بين الأقسام (الطلاب / الدروس) */
+        .main-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background-color: #14100c;
+            color: #d1bfa9;
+            border: 1px solid #261c14;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background-color: #d4af37;
+            color: #000000;
+            border-color: #d4af37;
+        }
+
         .form-section, .search-section {
             background: #14100c;
             padding: 18px;
@@ -186,6 +212,9 @@
         .delete-mode-btn:hover { background-color: #9c2828; }
         .new-mode-btn { background-color: #2e8b57; color: #ffffff; }
         .new-mode-btn:hover { background-color: #257347; }
+        
+        .section-view { display: none; }
+        .section-view.active { display: block; }
     </style>
 </head>
 <body>
@@ -196,65 +225,116 @@
             <img src="https://i.ibb.co/pvxkcrPf/logo.png" alt="شعار الموقع">
             <span> </span>
         </div>
-        <h2>لوحة إدارة الأكواد والطلاب</h2>
+        <h2>لوحة التحكم الشاملة</h2>
         <button class="logout-btn" onclick="logoutSystem()">خروج</button>
     </div>
 
-    <div class="search-section" id="searchSectionBox">
-        <label>🔍 بحث سريع (ابحث باسم الطالب أو بالكود):</label>
-        <input type="text" id="searchInput" placeholder="اكتب للبحث الفوري..." autocomplete="off" oninput="filterData()">
-        <div id="nameListContainer" class="name-list" style="display: none;"></div>
+    <!-- أزرار التبديل بين الأقسام -->
+    <div class="main-tabs">
+        <button class="tab-btn active" id="tabStudentsBtn" onclick="switchSection('students')">إدارة الطلاب والأكواد</button>
+        <button class="tab-btn" id="tabLessonsBtn" onclick="switchSection('lessons')">إدارة الدروس والفيديوهات</button>
     </div>
 
-    <div class="form-section">
-        <input type="hidden" id="originalCode" value="">
-        
-        <div class="form-group">
-            <label>الصف الدراسي / القسم:</label>
-            <select id="gradeSelect" onchange="handleGradeChange()">
-                <option value="prep_1">الأول الإعدادي</option>
-                <option value="prep_2">الثاني الإعدادي</option>
-                <option value="prep_3">الثالث الإعدادي</option>
-                <option value="sec_1">الأول الثانوي</option>
-                <option value="sec_2">الثاني الثانوي</option>
-                <option value="sec_3">الثالث الثانوي</option>
-                <option value="control_grade">كنترول (لوحة التحكم)</option>
-            </select>
+    <!-- قسم إدارة الطلاب والأكواد -->
+    <div id="studentsSection" class="section-view active">
+        <div class="search-section" id="searchSectionBox">
+            <label>🔍 بحث سريع (ابحث باسم الطالب أو بالكود):</label>
+            <input type="text" id="searchInput" placeholder="اكتب للبحث الفوري..." autocomplete="off" oninput="filterData()">
+            <div id="nameListContainer" class="name-list" style="display: none;"></div>
         </div>
 
-        <div class="form-group" id="studentNameGroup">
-            <label>اسم الطالب:</label>
-            <input type="text" id="studentNameInput" placeholder="أدخل اسم الطالب..." autocomplete="off">
-        </div>
+        <div class="form-section">
+            <input type="hidden" id="originalCode" value="">
+            
+            <div class="form-group">
+                <label>الصف الدراسي / القسم:</label>
+                <select id="gradeSelect" onchange="handleGradeChange()">
+                    <option value="prep_1">الأول الإعدادي</option>
+                    <option value="prep_2">الثاني الإعدادي</option>
+                    <option value="prep_3">الثالث الإعدادي</option>
+                    <option value="sec_1">الأول الثانوي</option>
+                    <option value="sec_2">الثاني الثانوي</option>
+                    <option value="sec_3">الثالث الثانوي</option>
+                    <option value="control_grade">كنترول (لوحة التحكم)</option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label id="codeLabel">كود التفعيل:</label>
-            <input type="text" id="codeInput" placeholder="أدخل الكود..." autocomplete="off">
-        </div>
+            <div class="form-group" id="studentNameGroup">
+                <label>اسم الطالب:</label>
+                <input type="text" id="studentNameInput" placeholder="أدخل اسم الطالب..." autocomplete="off">
+            </div>
 
-        <div class="form-group" id="statusGroup">
-            <label>حالة الكود:</label>
-            <select id="statusSelect">
-                <option value="true">يعمل</option>
-                <option value="false">لا يعمل</option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label id="codeLabel">كود التفعيل:</label>
+                <input type="text" id="codeInput" placeholder="أدخل الكود..." autocomplete="off">
+            </div>
 
-        <div id="defaultAddBtnContainer">
-            <button onclick="saveNewStudent()">إضافة طالب جديد</button>
-        </div>
+            <div class="form-group" id="statusGroup">
+                <label>حالة الكود:</label>
+                <select id="statusSelect">
+                    <option value="true">يعمل</option>
+                    <option value="false">لا يعمل</option>
+                </select>
+            </div>
 
-        <div id="selectedStudentActions" class="action-buttons" style="display: none;">
-            <button class="edit-mode-btn" onclick="enableEditing()">تعديل</button>
-            <button class="delete-mode-btn" onclick="deleteSelectedStudent()">حذف</button>
-            <button class="new-mode-btn" onclick="resetToAddNew()">إضافة طالب جديد</button>
+            <div id="defaultAddBtnContainer">
+                <button onclick="saveNewStudent()">إضافة طالب جديد</button>
+            </div>
+
+            <div id="selectedStudentActions" class="action-buttons" style="display: none;">
+                <button class="edit-mode-btn" onclick="enableEditing()">تعديل</button>
+                <button class="delete-mode-btn" onclick="deleteSelectedStudent()">حذف</button>
+                <button class="new-mode-btn" onclick="resetToAddNew()">إضافة طالب جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم إدارة الدروس والفيديوهات (مطابق لنفس القيم والمسارات) -->
+    <div id="lessonsSection" class="section-view">
+        <div class="form-section">
+            <div class="form-group">
+                <label>اختر الصف الدراسي:</label>
+                <select id="lessonGradeSelect">
+                    <option value="prep_1">الأول الإعدادي</option>
+                    <option value="prep_2">الثاني الإعدادي</option>
+                    <option value="prep_3">الثالث الإعدادي</option>
+                    <option value="sec_1">الأول الثانوي</option>
+                    <option value="sec_2">الثاني الثانوي</option>
+                    <option value="sec_3">الثالث الثانوي</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>رقم الوحدة:</label>
+                <select id="lessonUnitSelect">
+                    <option value="unit_1">الوحدة الأولى</option>
+                    <option value="unit_2">الوحدة الثانية</option>
+                    <option value="unit_3">الوحدة الثالثة</option>
+                    <option value="unit_4">الوحدة الرابعة</option>
+                    <option value="unit_5">الوحدة الخامسة</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>اسم الدرس:</label>
+                <input type="text" id="lessonNameInput" placeholder="مثال: الدرس الأول: الأعداد النسبية" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>رابط يوتيوب للفيديو:</label>
+                <input type="text" id="lessonUrlInput" placeholder="أدخل رابط فيديو اليوتيوب..." autocomplete="off">
+            </div>
+
+            <div>
+                <button onclick="saveNewLesson()" class="new-mode-btn">حفظ وإضافة الدرس</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
         databaseURL: "https://math-9cde7-default-rtdb.firebaseio.com/"
@@ -264,6 +344,26 @@
     const db = getDatabase(app);
 
     let allStudentsCache = [];
+
+    // التبديل بين الأقسام
+    window.switchSection = function(section) {
+        const studentsBtn = document.getElementById("tabStudentsBtn");
+        const lessonsBtn = document.getElementById("tabLessonsBtn");
+        const studentsView = document.getElementById("studentsSection");
+        const lessonsView = document.getElementById("lessonsSection");
+
+        if (section === 'students') {
+            studentsBtn.classList.add("active");
+            lessonsBtn.classList.remove("active");
+            studentsView.classList.add("active");
+            lessonsView.classList.remove("active");
+        } else {
+            lessonsBtn.classList.add("active");
+            studentsBtn.classList.remove("active");
+            lessonsView.classList.add("active");
+            studentsView.classList.remove("active");
+        }
+    };
 
     window.loadData = async function() {
         const dbRef = ref(db, 'grades');
@@ -296,11 +396,8 @@
 
     window.logoutSystem = function() {
         if (confirm("هل تريد الخروج وتسجيل الدخول من جديد؟")) {
-            // مسح أي بيانات دخول تلقائي أو بصمة جهاز مخزنة محلياً لتجبر النظام على طلب الكود
             localStorage.clear();
             sessionStorage.clear();
-            
-            // الانتقال لصفحة تسجيل الدخول
             window.location.href = "index.html";
         }
     };
@@ -561,6 +658,33 @@
             } catch (e) {
                 alert("حدث خطأ أثناء الحذف");
             }
+        }
+    };
+
+    // حفظ الدروس بنفس الهيكل المضبوط
+    window.saveNewLesson = async function() {
+        const grade = document.getElementById("lessonGradeSelect").value;
+        const unit = document.getElementById("lessonUnitSelect").value;
+        const lessonName = document.getElementById("lessonNameInput").value.trim();
+        const lessonUrl = document.getElementById("lessonUrlInput").value.trim();
+
+        if (!lessonName || !lessonUrl) {
+            alert("الرجاء ادخال اسم الدرس ورابط يوتيوب صحيح!");
+            return;
+        }
+
+        try {
+            const newLessonRef = push(ref(db, `lessons/${grade}/${unit}`));
+            await set(newLessonRef, {
+                title: lessonName,
+                url: lessonUrl
+            });
+
+            alert("تم حفظ وإضافة الدرس بنجاح!");
+            document.getElementById("lessonNameInput").value = "";
+            document.getElementById("lessonUrlInput").value = "";
+        } catch (e) {
+            alert("حدث خطأ أثناء حفظ الدرس في قاعدة البيانات.");
         }
     };
 
