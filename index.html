@@ -211,7 +211,6 @@
             object-fit: cover;
         }
 
-        /* تعديلات شاشات الكمبيوتر */
         @media (min-width: 769px) {
             header {
                 padding: 20px 40px;
@@ -319,7 +318,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // إضافة صف الكنترول مع الصفوف الدراسية وملف الـ control.html
         const gradeFiles = {
             "prep_1": "first-prep.html",
             "prep_2": "second-prep.html",
@@ -362,8 +360,8 @@
                         return;
                     }
 
-                    if (codeData.active === true) {
-                        if (!codeData.deviceId) {
+                    if (codeData.active !== false) {
+                        if (!codeData.deviceId && savedGrade !== "control_grade") {
                             await db.ref(`grades/${savedGrade}/codes/${savedCode}`).update({ deviceId: currentDevice });
                         }
                         window.location.href = gradeFiles[savedGrade];
@@ -388,7 +386,6 @@
             errorMsg.style.display = 'none';
             const currentDevice = getDeviceId();
             
-            // إضافة control_grade لمصفوفة البحث ليتعامل مع الكود كباقي الصفوف تماماً
             const gradesKeys = ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3", "control_grade"];
             
             let foundGrade = null;
@@ -416,16 +413,18 @@
                     return;
                 }
 
-                if (foundData.deviceId && foundData.deviceId !== currentDevice) {
-                    errorMsg.innerText = "عذراً، هذا الكود مرتبط بجهاز آخر بالفعل.";
-                    errorMsg.style.display = 'block';
-                    return;
-                }
+                if (foundGrade !== "control_grade") {
+                    if (foundData.deviceId && foundData.deviceId !== currentDevice) {
+                        errorMsg.innerText = "عذراً، هذا الكود مرتبط بجهاز آخر بالفعل.";
+                        errorMsg.style.display = 'block';
+                        return;
+                    }
 
-                if (!foundData.deviceId) {
-                    await db.ref(`grades/${foundGrade}/codes/${inputCode}`).update({
-                        deviceId: currentDevice
-                    });
+                    if (!foundData.deviceId) {
+                        await db.ref(`grades/${foundGrade}/codes/${inputCode}`).update({
+                            deviceId: currentDevice
+                        });
+                    }
                 }
 
                 localStorage.setItem('activeStudentCode', inputCode);
