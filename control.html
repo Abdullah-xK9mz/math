@@ -106,7 +106,6 @@
             margin: 0 10px;
         }
 
-        /* أزرار التنقل بين الأقسام (الطلاب / الدروس) */
         .main-tabs {
             display: flex;
             gap: 10px;
@@ -229,13 +228,11 @@
         <button class="logout-btn" onclick="logoutSystem()">خروج</button>
     </div>
 
-    <!-- أزرار التبديل بين الأقسام -->
     <div class="main-tabs">
         <button class="tab-btn active" id="tabStudentsBtn" onclick="switchSection('students')">إدارة الطلاب والأكواد</button>
         <button class="tab-btn" id="tabLessonsBtn" onclick="switchSection('lessons')">إدارة الدروس والفيديوهات</button>
     </div>
 
-    <!-- قسم إدارة الطلاب والأكواد -->
     <div id="studentsSection" class="section-view active">
         <div class="search-section" id="searchSectionBox">
             <label>🔍 بحث سريع (ابحث باسم الطالب أو بالكود):</label>
@@ -249,12 +246,12 @@
             <div class="form-group">
                 <label>الصف الدراسي / القسم:</label>
                 <select id="gradeSelect" onchange="handleGradeChange()">
-                    <option value="prep_1">الأول الإعدادي</option>
-                    <option value="prep_2">الثاني الإعدادي</option>
-                    <option value="prep_3">الثالث الإعدادي</option>
-                    <option value="sec_1">الأول الثانوي</option>
-                    <option value="sec_2">الثاني الثانوي</option>
-                    <option value="sec_3">الثالث الثانوي</option>
+                    <option value="first-prep">الأول الإعدادي (first-prep)</option>
+                    <option value="second-prep">الثاني الإعدادي (second-prep)</option>
+                    <option value="third-prep">الثالث الإعدادي (third-prep)</option>
+                    <option value="first-sec">الأول الثانوي (first-sec)</option>
+                    <option value="second-sec">الثاني الثانوي (second-sec)</option>
+                    <option value="third-sec">الثالث الثانوي (third-sec)</option>
                     <option value="control_grade">كنترول (لوحة التحكم)</option>
                 </select>
             </div>
@@ -289,18 +286,17 @@
         </div>
     </div>
 
-    <!-- قسم إدارة الدروس والفيديوهات (مطابق لنفس القيم والمسارات) -->
     <div id="lessonsSection" class="section-view">
         <div class="form-section">
             <div class="form-group">
                 <label>اختر الصف الدراسي:</label>
                 <select id="lessonGradeSelect">
-                    <option value="prep_1">الأول الإعدادي</option>
-                    <option value="prep_2">الثاني الإعدادي</option>
-                    <option value="prep_3">الثالث الإعدادي</option>
-                    <option value="sec_1">الأول الثانوي</option>
-                    <option value="sec_2">الثاني الثانوي</option>
-                    <option value="sec_3">الثالث الثانوي</option>
+                    <option value="first-prep">الأول الإعدادي</option>
+                    <option value="second-prep">الثاني الإعدادي</option>
+                    <option value="third-prep">الثالث الإعدادي</option>
+                    <option value="first-sec">الأول الثانوي</option>
+                    <option value="second-sec">الثاني الثانوي</option>
+                    <option value="third-sec">الثالث الثانوي</option>
                 </select>
             </div>
 
@@ -343,9 +339,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    const ALL_GRADE_KEYS = ["first-prep", "second-prep", "third-prep", "first-sec", "second-sec", "third-sec"];
+
     let allStudentsCache = [];
 
-    // التبديل بين الأقسام
     window.switchSection = function(section) {
         const studentsBtn = document.getElementById("tabStudentsBtn");
         const lessonsBtn = document.getElementById("tabLessonsBtn");
@@ -550,7 +547,7 @@
     };
 
     window.resetToAddNew = function() {
-        document.getElementById("gradeSelect").value = "prep_1";
+        document.getElementById("gradeSelect").value = "first-prep";
         handleGradeChange();
         document.getElementById("studentNameInput").value = "";
         document.getElementById("codeInput").value = "";
@@ -621,7 +618,7 @@
 
         try {
             if (oldCode && oldCode !== newCode) {
-                for (let gKey of ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"]) {
+                for (let gKey of ALL_GRADE_KEYS) {
                     await remove(ref(db, `grades/${gKey}/codes/${oldCode}`));
                 }
             }
@@ -648,7 +645,7 @@
                 if (grade === "control_grade") {
                     await remove(ref(db, `grades/control_grade/codes/${code}`));
                 } else {
-                    for (let gKey of ["prep_1", "prep_2", "prep_3", "sec_1", "sec_2", "sec_3"]) {
+                    for (let gKey of ALL_GRADE_KEYS) {
                         await remove(ref(db, `grades/${gKey}/codes/${code}`));
                     }
                 }
@@ -661,7 +658,6 @@
         }
     };
 
-    // حفظ الدروس بنفس الهيكل المضبوط
     window.saveNewLesson = async function() {
         const grade = document.getElementById("lessonGradeSelect").value;
         const unit = document.getElementById("lessonUnitSelect").value;
