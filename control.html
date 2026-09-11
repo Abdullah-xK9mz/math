@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة إدارة الأكواد والطلاب</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/pvxkcrPf/logo.png">
     <style>
         * {
             box-sizing: border-box;
@@ -57,13 +58,52 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
             border: 1px solid #261c14;
             width: 100%;
+            position: relative;
         }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #261c14;
+            padding-bottom: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 17px;
+        }
+        .logo-area img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .logout-btn {
+            background-color: #b83232;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+            width: auto;
+            margin-top: 0;
+        }
+        .logout-btn:hover { background-color: #9c2828; }
+        
         h2 { 
             text-align: center; 
             color: #ffffff; 
             font-size: 23px; 
             font-weight: bold;
-            margin-bottom: 20px;
+            flex-grow: 1;
+            margin: 0 10px;
         }
         .form-section, .search-section {
             background: #14100c;
@@ -151,7 +191,14 @@
 <body>
 
 <div class="container">
-    <h2>لوحة إدارة الأكواد والطلاب</h2>
+    <div class="header-top">
+        <div class="logo-area">
+            <img src="https://i.ibb.co/pvxkcrPf/logo.png" alt="شعار الموقع">
+            <span> </span>
+        </div>
+        <h2>لوحة إدارة الأكواد والطلاب</h2>
+        <button class="logout-btn" onclick="logoutSystem()">خروج</button>
+    </div>
 
     <div class="search-section" id="searchSectionBox">
         <label>🔍 بحث سريع (ابحث باسم الطالب أو بالكود):</label>
@@ -244,6 +291,12 @@
             }
         } catch (error) {
             console.error("خطأ في التحميل");
+        }
+    };
+
+    window.logoutSystem = function() {
+        if (confirm("هل تريد الخروج والانتقال للصفحة الرئيسية؟")) {
+            window.location.href = "index.html";
         }
     };
 
